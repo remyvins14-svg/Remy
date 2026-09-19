@@ -1,1 +1,667 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0e16">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cap 2027">
+<title>Cap 2027 – Épargne et apport</title>
+<style>
+:root{
+  --bg:#0a0e16; --s1:#111725; --s2:#171f31; --line:#222c40;
+  --tx:#eaf0fa; --mu:#8a96ac;
+  --teal:#35d6a4; --peri:#8f9dff; --amber:#ffb454; --rose:#ff6f86; --sky:#4aa8ff; --violet:#9a86ff; --slate:#6f7f9f;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--tx);
+  font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1100px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 16px calc(56px + env(safe-area-inset-bottom))}
+header.top{margin-bottom:16px}
+h1{font-size:21px;margin:0;letter-spacing:-.01em}
+.sub{color:var(--mu);font-size:14px}
+h2{font-size:17px;margin:0;font-weight:650}
+h3{display:flex;align-items:center;gap:8px;font-size:14.5px;margin:24px 0 2px;font-weight:650}
+h3::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c,var(--teal))}
+.grp:first-child h3{margin-top:0}
 
+.layout{display:grid;gap:16px;grid-template-areas:"hero" "chart" "controls" "debts"}
+@media(min-width:920px){
+  .layout{grid-template-columns:400px 1fr;grid-template-areas:"hero hero" "controls chart" "controls debts";align-items:start}
+  #controls{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}
+}
+.panel{background:var(--s1);border:1px solid var(--line);border-radius:20px;padding:18px}
+.p-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:14px}
+
+/* Hero */
+#hero{grid-area:hero;border-radius:26px;padding:22px 20px}
+.hero-in{display:grid;gap:22px}
+@media(min-width:920px){.hero-in{grid-template-columns:1fr 1.15fr;align-items:center;gap:40px}}
+.hero-label{color:var(--mu);font-size:15px}
+.big{font-size:clamp(54px,15vw,92px);font-weight:750;letter-spacing:-.04em;line-height:1.02;margin:6px 0 8px;color:var(--teal)}
+.big.neg{color:var(--rose);font-weight:750}
+.hero-note{margin:0;color:var(--mu);font-size:14.5px;max-width:46ch}
+.split-title{font-size:14px;color:var(--mu);margin-bottom:10px}
+.stack{display:flex;gap:2px;height:16px;border-radius:8px;overflow:hidden;background:#1c2537}
+.stack i{display:block;height:100%;transition:width .2s}
+.legend{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+.legend li{display:flex;align-items:center;gap:10px;font-size:14.5px}
+.legend li i{width:10px;height:10px;border-radius:3px;flex:none}
+.legend li span{flex:1;color:var(--mu)}
+.legend li b{font-weight:600}
+
+/* Chart + KPIs */
+#chartPanel{grid-area:chart}
+#controls{grid-area:controls}
+#debts{grid-area:debts}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.kpi{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--s2)}
+.kpi.a{border-color:rgba(53,214,164,.45)}
+.kpi-k{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--mu)}
+.kpi b{display:block;font-size:clamp(20px,6vw,26px);letter-spacing:-.02em;margin:4px 0 2px}
+.kpi small{color:var(--mu);font-size:13px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.chart{position:relative;height:270px}
+.chart.short{height:220px;margin-top:16px}
+.nochart{display:grid;place-items:center;height:100%;text-align:center;color:var(--mu);font-size:14px;padding:0 16px}
+.nochart a{color:var(--peri)}
+.key{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:12px;font-size:13px;color:var(--mu)}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key .ln{width:18px;height:0;border-top:3px solid var(--teal);border-radius:2px}
+.key .ln.d{border-top:2px dashed var(--peri)}
+.key .ln.a{border-top-color:var(--amber)}
+.key .ring{width:10px;height:10px;border-radius:50%;border:3px solid var(--teal);background:var(--bg)}
+.net{margin:12px 0 0;font-size:14px;color:var(--mu)}
+.pos{color:var(--teal);font-weight:650}
+.neg{color:var(--rose);font-weight:650}
+
+/* Controls */
+.f{padding:12px 0;border-top:1px solid var(--line)}
+.grp h3+.f{border-top:0}
+.f-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:4px}
+.f-head label{font-size:14.5px;color:var(--mu);line-height:1.3}
+.num{display:flex;align-items:center;background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:0 10px;height:38px;flex:none}
+.num:focus-within{border-color:var(--teal)}
+.num input{width:74px;background:transparent;border:0;color:var(--tx);font-weight:600;font-size:16px;font-family:inherit;text-align:right;outline:0;padding:0;-moz-appearance:textfield}
+.num input::-webkit-inner-spin-button,.num input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.num input[type=month]{width:150px;text-align:left;color-scheme:dark}
+.num span{color:var(--mu);margin-left:5px;font-size:14px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:32px;background:transparent;margin:0;--p:0%;--c:var(--teal)}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(to right,var(--c) var(--p),#26314a var(--p))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:0;margin-top:-9px;box-shadow:0 1px 6px rgba(0,0,0,.55)}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:#26314a}
+input[type=range]::-moz-range-progress{height:6px;border-radius:3px;background:var(--c)}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border:0;border-radius:50%;background:#fff}
+input:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--peri);outline-offset:3px;border-radius:8px}
+.hint{margin:6px 0 0;font-size:13px;color:var(--mu)}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--s2);border-radius:12px;padding:3px;gap:3px;margin-top:6px}
+.seg button{background:transparent;border:0;color:var(--mu);font-weight:600;font-size:14.5px;font-family:inherit;height:40px;border-radius:9px}
+.seg button[aria-pressed=true]{background:#28344e;color:var(--tx)}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--mu);border-radius:10px;padding:7px 12px;font-size:14px;font-family:inherit}
+.btn{background:var(--teal);color:#04241b;border:0;border-radius:10px;height:42px;padding:0 16px;font-weight:700;font-size:15px;font-family:inherit}
+.est{margin:6px 0 4px;background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.est summary{cursor:pointer;color:var(--peri);font-size:14.5px;font-weight:600}
+.est-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 12px}
+.est-grid label{display:block;font-size:12.5px;color:var(--mu);margin-bottom:4px}
+.est-grid input{width:100%;height:40px;background:#0f1522;border:1px solid var(--line);border-radius:10px;color:var(--tx);font-size:16px;font-family:inherit;padding:0 10px}
+.est-out{font-size:14px;margin-bottom:12px}
+
+/* Dettes */
+.debt-hero{font-size:clamp(28px,8vw,38px);font-weight:750;letter-spacing:-.03em;line-height:1.1}
+.debt-hero small{display:block;font-size:14.5px;font-weight:400;letter-spacing:0;color:var(--mu);margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.chip{background:var(--s2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13.5px;color:var(--mu)}
+.chip b{color:var(--tx);font-weight:650}
+.row{padding:12px 0;border-top:1px solid var(--line)}
+.row-h{display:flex;justify-content:space-between;gap:12px;font-size:15px;margin-bottom:8px}
+.row-h span{font-weight:600}
+.row-h em{font-style:normal;color:var(--amber);font-weight:650;text-align:right}
+.row-f{font-size:13px;color:var(--mu);margin-top:6px}
+.bar{height:10px;border-radius:5px;background:#1c2537;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:5px;transition:width .25s}
+.bar.thin{height:5px;margin-top:5px}
+.bar .never{background:repeating-linear-gradient(45deg,#3a4560 0 6px,#2a3448 6px 12px)}
+.free-line{margin:14px 0 0;font-size:14.5px}
+.free-line b{color:var(--teal)}
+
+footer{margin-top:26px;color:var(--mu);font-size:13.5px}
+footer details{margin-bottom:10px}
+footer summary{cursor:pointer;color:var(--peri);font-weight:600}
+footer p{margin:8px 0 0;max-width:62ch}
+
+/* Barre de résumé */
+#sticky{position:fixed;top:0;left:0;right:0;z-index:20;padding:calc(8px + env(safe-area-inset-top)) 16px 8px;background:rgba(10,14,22,.93);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transform:translateY(-115%);transition:transform .2s}
+#sticky.on{transform:none}
+.st-in{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;gap:16px}
+.st-in div{display:flex;flex-direction:column;min-width:0}
+.st-in div:last-child{text-align:right}
+.st-in span{font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-in b{font-size:19px;letter-spacing:-.02em}
+#stV{color:var(--teal)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div id="sticky" aria-hidden="true">
+  <div class="st-in">
+    <div><span>Virement du 1er</span><b id="stV">0 €</b></div>
+    <div><span id="stAL">Apport</span><b id="stA">0 €</b></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Cap 2027</h1>
+    <div class="sub" id="topSub">Tableau de bord d'épargne et d'apport</div>
+  </header>
+
+  <main class="layout">
+
+    <section id="hero" class="panel" aria-live="polite">
+      <div class="hero-in">
+        <div>
+          <div class="hero-label">Virement à effectuer le 1er du mois</div>
+          <div class="big" id="bigVir">0 €</div>
+          <p class="hero-note" id="heroNote"></p>
+        </div>
+        <div>
+          <div class="split-title">Répartition des revenus mensuels</div>
+          <div class="stack" id="stack" role="img" aria-label="Répartition des revenus mensuels"></div>
+          <ul class="legend" id="stackLegend"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="chartPanel" class="panel">
+      <div class="p-head"><h2>Accumulation de l'apport</h2><span class="sub" id="chartSub"></span></div>
+      <div class="kpis">
+        <div class="kpi a">
+          <span class="kpi-k"><i class="dot" style="background:var(--teal)"></i><span id="kAName">Boule de neige</span></span>
+          <b id="kAApport">0 €</b><small id="kADette"></small>
+        </div>
+        <div class="kpi">
+          <span class="kpi-k"><i class="dot" style="background:var(--peri)"></i><span>Sans remboursement anticipé</span></span>
+          <b id="kBApport">0 €</b><small id="kBDette"></small>
+        </div>
+      </div>
+      <div class="chart"><canvas id="c1" role="img" aria-label="Projection de l'apport mois par mois jusqu'à l'échéance"></canvas></div>
+      <div class="key">
+        <span><i class="ln"></i><span id="keyA">Boule de neige</span></span>
+        <span><i class="ln d"></i>Sans remboursement anticipé</span>
+        <span><i class="ring"></i>Dettes soldées</span>
+      </div>
+      <p class="net" id="netLine"></p>
+    </section>
+
+    <section id="controls" class="panel">
+      <div class="p-head"><h2>Panneau de contrôle</h2><button class="ghost" id="reset" type="button">Réinitialiser</button></div>
+      <div id="ctlBody"></div>
+    </section>
+
+    <section id="debts" class="panel">
+      <div class="p-head"><h2>Destruction de dettes</h2><span class="sub" id="debtSub"></span></div>
+      <div id="debtBody"></div>
+      <div class="chart short" id="c2wrap"><canvas id="c2" role="img" aria-label="Dette restante mois par mois"></canvas></div>
+      <div class="key" id="c2key">
+        <span><i class="ln a"></i><span id="keyA2">Boule de neige</span></span>
+        <span><i class="ln d"></i>Sans remboursement anticipé</span>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <details>
+      <summary>Ajouter à l'écran d'accueil</summary>
+      <p>iPhone (Safari) : Partager, puis « Sur l'écran d'accueil ». Android (Chrome) : menu ⋮, puis « Ajouter à l'écran d'accueil ».</p>
+    </details>
+    <p>Les valeurs sont enregistrées dans ce navigateur, sur cet appareil. Le premier lancement demande une connexion pour charger Chart.js.</p>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* ================= Valeurs de départ ================= */
+const KEY='cap2027:v1';
+const DEF={
+  salaire:1950, prime:200, autres:0,
+  loyer:400, carbu:550, vie:500,
+  mAuto:250, kAuto:4200, tAuto:4.5,
+  mConso:150, kConso:2400, tConso:6.5,
+  epargne:0, travaux:0, part:100,
+  echeance:'2027-07', strat:'snow',
+  km:40000, lkm:6, prixL:1.75, entKm:0.06
+};
+
+const FIELDS={
+  salaire:{label:'Salaire net',min:0,max:5000,step:10},
+  prime:{label:'Prime repas',min:0,max:1000,step:10},
+  autres:{label:'Autres revenus (loyers nets…)',min:0,max:3000,step:10},
+  loyer:{label:'Loyer / logement actuel',min:0,max:2000,step:10},
+  carbu:{label:'Budget carburant et entretien',min:0,max:1500,step:10},
+  vie:{label:'Frais de vie (alimentation, assurances…)',min:0,max:2500,step:10},
+  mAuto:{label:'Mensualité',min:0,max:1000,step:5},
+  kAuto:{label:'Capital restant dû',min:0,max:50000,step:100},
+  tAuto:{label:'Taux annuel',min:0,max:15,step:0.1,unit:'%'},
+  mConso:{label:'Mensualité',min:0,max:800,step:5},
+  kConso:{label:'Capital restant dû',min:0,max:40000,step:100},
+  tConso:{label:'Taux annuel',min:0,max:20,step:0.1,unit:'%'},
+  epargne:{label:'Épargne déjà disponible',min:0,max:100000,step:100},
+  travaux:{label:'Travaux à payer sur ma trésorerie',min:0,max:40000,step:100},
+  part:{label:'Part du surplus injectée dans les dettes',min:0,max:100,step:5,unit:'%'}
+};
+const GROUPS=[
+  {t:'Revenus mensuels nets',c:'var(--teal)',ids:['salaire','prime','autres']},
+  {t:'Logement et vie courante',c:'var(--peri)',ids:['loyer','carbu','vie']},
+  {t:'Crédit auto',c:'var(--amber)',ids:['mAuto','kAuto','tAuto']},
+  {t:'Prêt conso',c:'var(--amber)',ids:['mConso','kConso','tConso']}
+];
+
+let S=load();
+function load(){
+  const r=Object.assign({},DEF);
+  try{
+    const o=JSON.parse(localStorage.getItem(KEY)||'null');
+    if(o) for(const k in DEF){ if(k in o && typeof o[k]===typeof DEF[k] && (typeof o[k]!=='number'||isFinite(o[k]))) r[k]=o[k]; }
+  }catch(e){}
+  return r;
+}
+function save(){ try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){} }
+
+/* ================= Formats ================= */
+const nf=new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0});
+const eur=n=>nf.format(Math.round(n)===0?0:Math.round(n));
+const moisLong=d=>d.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+const moisCourt=d=>d.toLocaleDateString('fr-FR',{month:'short',year:'2-digit'});
+const jourLong=d=>d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+const fm=n=>n+' mois';
+const $=id=>document.getElementById(id);
+const C={teal:'#35d6a4',peri:'#8f9dff',amber:'#ffb454',bg:'#0a0e16'};
+
+/* ================= Moteur de calcul ================= */
+/*ENGINE*/
+function order(loans,mode){
+  const a=loans.filter(l=>l.bal>0.005);
+  return mode==='aval'
+    ? a.sort((x,y)=>y.r-x.r||x.bal-y.bal)      /* taux le plus haut d'abord */
+    : a.sort((x,y)=>x.bal-y.bal||y.r-x.r);     /* plus petit solde d'abord */
+}
+function simulate(s,mode,H){
+  const loans=[
+    {id:'auto',bal:s.kAuto,pay:s.mAuto,r:s.tAuto/1200},
+    {id:'conso',bal:s.kConso,pay:s.mConso,r:s.tConso/1200}
+  ];
+  const base=s.salaire+s.prime+s.autres-s.loyer-s.carbu-s.vie;
+  let cash=s.epargne-s.travaux, interest=0;
+  const payoff={auto:null,conso:null};
+  loans.forEach(l=>{ if(l.bal<=0.005){l.bal=0;payoff[l.id]=0;} });
+  const sum=()=>loans.reduce((t,l)=>t+l.bal,0);
+  const cashS=[cash], debtS=[sum()];
+  for(let m=1;m<=H;m++){
+    let avail=base;
+    for(const l of loans){
+      if(l.bal<=0) continue;
+      const i=l.bal*l.r; interest+=i;
+      const p=Math.min(l.pay,l.bal+i);
+      l.bal=l.bal+i-p; avail-=p;
+      if(l.bal<=0.005){l.bal=0;payoff[l.id]=m;}
+    }
+    if(mode!=='min' && avail>0){
+      let pool=avail*s.part/100;
+      for(const l of order(loans,mode)){
+        if(pool<=0) break;
+        const x=Math.min(pool,l.bal);
+        l.bal-=x; pool-=x; avail-=x;
+        if(l.bal<=0.005){l.bal=0;payoff[l.id]=m;}
+      }
+    }
+    cash+=avail;
+    cashS.push(cash); debtS.push(sum());
+  }
+  const vals=[payoff.auto,payoff.conso];
+  const free=vals.some(v=>v===null)?null:Math.max(0,...vals);
+  return {cash:cashS,debt:debtS,payoff,free,interest};
+}
+function timeline(s){
+  const now=new Date();
+  const first=new Date(now.getFullYear(),now.getMonth()+(now.getDate()===1?0:1),1);
+  const parts=String(s.echeance||'').split('-').map(Number);
+  const y=parts[0]||2027, m=parts[1]||7;
+  const end=new Date(y,m-1,1);
+  const N=Math.max(0,(end.getFullYear()-first.getFullYear())*12+end.getMonth()-first.getMonth()+1);
+  return {first,end,N};
+}
+/*END-ENGINE*/
+
+/* ================= Interface : champs ================= */
+const REFS={};
+function fieldEl(id,color){
+  const f=FIELDS[id];
+  const el=document.createElement('div'); el.className='f'; el.style.setProperty('--c',color);
+  el.innerHTML=
+    '<div class="f-head"><label for="in-'+id+'">'+f.label+'</label>'+
+    '<div class="num"><input id="in-'+id+'" type="number" inputmode="decimal" min="0" step="'+f.step+'"><span>'+(f.unit||'€')+'</span></div></div>'+
+    '<input type="range" aria-label="'+f.label+'" min="'+f.min+'" max="'+f.max+'" step="'+f.step+'">';
+  const num=el.querySelector('input[type=number]'), rg=el.querySelector('input[type=range]');
+  REFS[id]={num,rg,f};
+  rg.addEventListener('input',()=>{ S[id]=parseFloat(rg.value)||0; num.value=S[id]; fill(rg,f); update(); });
+  num.addEventListener('input',()=>{ const v=parseFloat(String(num.value).replace(',','.')); S[id]=isFinite(v)&&v>=0?v:0; rg.value=S[id]; fill(rg,f); update(); });
+  num.addEventListener('change',()=>{ num.value=S[id]; });
+  return el;
+}
+function fill(rg,f){
+  const v=Math.min(Math.max(parseFloat(rg.value)||0,f.min),f.max);
+  rg.style.setProperty('--p',((v-f.min)/(f.max-f.min)*100)+'%');
+}
+function syncField(id){
+  const r=REFS[id]; r.num.value=S[id]; r.rg.value=S[id]; fill(r.rg,r.f);
+}
+function estEl(){
+  const d=document.createElement('details'); d.className='est';
+  d.innerHTML=
+    '<summary>Estimer depuis mes kilomètres</summary>'+
+    '<div class="est-grid">'+
+    '<div><label for="e-km">Kilomètres par an</label><input id="e-km" type="number" inputmode="decimal" min="0" step="1000"></div>'+
+    '<div><label for="e-lkm">Conso (L/100 km)</label><input id="e-lkm" type="number" inputmode="decimal" min="0" step="0.1"></div>'+
+    '<div><label for="e-prixL">Prix du litre (€)</label><input id="e-prixL" type="number" inputmode="decimal" min="0" step="0.01"></div>'+
+    '<div><label for="e-entKm">Usure et entretien (€/km)</label><input id="e-entKm" type="number" inputmode="decimal" min="0" step="0.01"></div>'+
+    '</div><div class="est-out" id="estOut"></div>'+
+    '<button type="button" class="btn" id="estApply">Appliquer à mon budget</button>';
+  return d;
+}
+function wireEst(){
+  const keys=['km','lkm','prixL','entKm'];
+  const out=$('estOut');
+  const calc=()=>{
+    const carb=S.km*S.lkm/100*S.prixL/12, ent=S.km*S.entKm/12;
+    out.innerHTML='≈ <b>'+eur(carb+ent)+'</b> par mois : carburant '+eur(carb)+', entretien '+eur(ent);
+    return carb+ent;
+  };
+  keys.forEach(k=>{
+    const i=$('e-'+k); i.value=S[k];
+    i.addEventListener('input',()=>{ const v=parseFloat(String(i.value).replace(',','.')); S[k]=isFinite(v)&&v>=0?v:0; calc(); save(); });
+  });
+  $('estApply').addEventListener('click',()=>{
+    S.carbu=Math.min(Math.round(calc()/10)*10,100000); syncField('carbu'); update();
+  });
+  calc();
+  wireEst.calc=calc;
+}
+function build(){
+  const body=$('ctlBody');
+  GROUPS.forEach(g=>{
+    const sec=document.createElement('div'); sec.className='grp'; sec.style.setProperty('--c',g.c);
+    sec.innerHTML='<h3>'+g.t+'</h3>';
+    g.ids.forEach(id=>{
+      sec.appendChild(fieldEl(id,g.c));
+      if(id==='carbu') sec.appendChild(estEl());
+    });
+    body.appendChild(sec);
+  });
+  const plan=document.createElement('div'); plan.className='grp'; plan.style.setProperty('--c','var(--teal)');
+  plan.innerHTML=
+    '<h3>Objectif et méthode</h3>'+
+    '<div class="f"><div class="f-head"><label for="echeance">Échéance de l\'apport</label><div class="num"><input id="echeance" type="month"></div></div></div>';
+  plan.appendChild(fieldEl('epargne','var(--teal)'));
+  plan.appendChild(fieldEl('travaux','var(--teal)'));
+  const seg=document.createElement('div'); seg.className='f';
+  seg.innerHTML=
+    '<div class="f-head"><label>Méthode de remboursement anticipé</label></div>'+
+    '<div class="seg" id="seg"><button type="button" data-v="snow">Boule de neige</button><button type="button" data-v="aval">Avalanche</button></div>'+
+    '<p class="hint" id="segHint"></p>';
+  plan.appendChild(seg);
+  plan.appendChild(fieldEl('part','var(--amber)'));
+  body.appendChild(plan);
+
+  wireEst();
+  $('echeance').addEventListener('input',e=>{ if(e.target.value){ S.echeance=e.target.value; update(); } });
+  $('seg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.strat=b.dataset.v; update(); });
+  $('reset').addEventListener('click',()=>{ S=Object.assign({},DEF); syncAll(); update(); });
+  syncAll();
+}
+function syncAll(){
+  Object.keys(FIELDS).forEach(syncField);
+  $('echeance').value=S.echeance;
+  ['km','lkm','prixL','entKm'].forEach(k=>{ $('e-'+k).value=S[k]; });
+  if(wireEst.calc) wireEst.calc();
+}
+
+/* ================= Graphiques ================= */
+let c1=null,c2=null,mark1=-1;
+const kfmt=v=>Math.abs(v)>=1000?(v/1000).toLocaleString('fr-FR',{maximumFractionDigits:1})+' k€':Math.round(v)+' €';
+function chartBase(){
+  return {
+    responsive:true,maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        backgroundColor:'#171f31',borderColor:'#2c3852',borderWidth:1,titleColor:'#eaf0fa',bodyColor:'#c9d3e6',
+        padding:10,displayColors:true,
+        callbacks:{label:c=>' '+c.dataset.label+' : '+eur(c.parsed.y)}
+      }
+    },
+    scales:{
+      x:{grid:{display:false},border:{display:false},ticks:{color:'#8a96ac',maxTicksLimit:6,maxRotation:0}},
+      y:{grace:'6%',grid:{color:'rgba(255,255,255,.06)'},border:{display:false},ticks:{color:'#8a96ac',maxTicksLimit:5,callback:kfmt}}
+    }
+  };
+}
+function initCharts(){
+  if(typeof Chart==='undefined'){
+    document.querySelectorAll('.chart').forEach(el=>{
+      el.innerHTML='<div class="nochart"><div>Chart.js n\'a pas pu se charger. Connecte-toi à internet, puis <a href="">recharge la page</a>.</div></div>';
+    });
+    return;
+  }
+  Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif';
+  const o1=chartBase();
+  o1.plugins.tooltip.callbacks.title=items=>items[0].dataIndex===0?'Aujourd\'hui':(items[0].chart.$full||[])[items[0].dataIndex]||'';
+  c1=new Chart($('c1'),{type:'line',data:{labels:[],datasets:[
+    {label:'Boule de neige',data:[],borderColor:C.teal,borderWidth:3,tension:.25,fill:'origin',
+     backgroundColor:ctx=>{
+       const a=ctx.chart.chartArea; if(!a) return 'rgba(53,214,164,.15)';
+       const g=ctx.chart.ctx.createLinearGradient(0,a.top,0,a.bottom);
+       g.addColorStop(0,'rgba(53,214,164,.34)'); g.addColorStop(1,'rgba(53,214,164,0)'); return g;
+     },
+     pointRadius:ctx=>ctx.dataIndex===mark1?6:0,pointHoverRadius:5,
+     pointBackgroundColor:C.bg,pointBorderColor:C.teal,pointBorderWidth:3},
+    {label:'Sans remboursement anticipé',data:[],borderColor:C.peri,borderWidth:2,borderDash:[6,5],tension:.25,pointRadius:0,pointHoverRadius:4,fill:false}
+  ]},options:o1});
+  const o2=chartBase();
+  o2.plugins.tooltip.callbacks.title=items=>items[0].dataIndex===0?'Aujourd\'hui':(items[0].chart.$full||[])[items[0].dataIndex]||'';
+  c2=new Chart($('c2'),{type:'line',data:{labels:[],datasets:[
+    {label:'Boule de neige',data:[],borderColor:C.amber,borderWidth:3,tension:.2,fill:'origin',
+     backgroundColor:ctx=>{
+       const a=ctx.chart.chartArea; if(!a) return 'rgba(255,180,84,.12)';
+       const g=ctx.chart.ctx.createLinearGradient(0,a.top,0,a.bottom);
+       g.addColorStop(0,'rgba(255,180,84,.28)'); g.addColorStop(1,'rgba(255,180,84,0)'); return g;
+     },pointRadius:0,pointHoverRadius:4},
+    {label:'Sans remboursement anticipé',data:[],borderColor:C.peri,borderWidth:2,borderDash:[6,5],tension:.2,pointRadius:0,pointHoverRadius:4,fill:false}
+  ]},options:o2});
+}
+
+/* ================= Rendu ================= */
+function update(){
+  const s=S;
+  const rev=s.salaire+s.prime+s.autres;
+  const fixes=s.loyer+s.carbu;
+  const dettes=s.mAuto+s.mConso;
+  const cap=rev-(fixes+dettes+s.vie);
+  const tl=timeline(s), N=tl.N;
+  const H=480;
+  const A=simulate(s,s.strat,H), B=simulate(s,'min',H);
+  const dateOf=m=>new Date(tl.first.getFullYear(),tl.first.getMonth()+m-1,1);
+  const planName=s.strat==='aval'?'Avalanche':'Boule de neige';
+  const D0=s.kAuto+s.kConso;
+
+  /* Hero */
+  const big=$('bigVir');
+  big.textContent=eur(cap);
+  big.classList.toggle('neg',cap<0);
+  let note;
+  if(cap<0) note='Charges et dettes dépassent les revenus de '+eur(-cap)+' par mois.';
+  else if(N===0) note='L\'échéance est déjà passée : choisis une date à venir.';
+  else note='Prochain virement le '+jourLong(tl.first)+'. '+N+' virement'+(N>1?'s':'')+' d\'ici '+moisLong(tl.end)+(rev>0?', soit '+Math.round(cap/rev*100)+' % des revenus.':'.');
+  $('heroNote').textContent=note;
+
+  const total=Math.max(rev,fixes+dettes+s.vie,1);
+  const items=[
+    {l:'Logement',v:s.loyer,c:'var(--slate)'},
+    {l:'Carburant et entretien',v:s.carbu,c:'var(--sky)'},
+    {l:'Frais de vie',v:s.vie,c:'var(--violet)'},
+    {l:'Crédits',v:dettes,c:'var(--amber)'},
+    {l:'Épargne',v:Math.max(cap,0),c:'var(--teal)'}
+  ];
+  $('stack').innerHTML=items.filter(i=>i.v>0).map(i=>'<i style="width:'+(i.v/total*100)+'%;background:'+i.c+'"></i>').join('');
+  $('stackLegend').innerHTML=items.map(i=>'<li><i style="background:'+i.c+'"></i><span>'+i.l+'</span><b>'+eur(i.v)+'</b></li>').join('');
+
+  /* KPIs apport */
+  const aAp=A.cash[N], bAp=B.cash[N], aD=A.debt[N], bD=B.debt[N];
+  const dline=d=>d<=0.5?'Dettes soldées':'Dette restante : '+eur(d);
+  $('kAName').textContent=planName; $('keyA').textContent=planName; $('keyA2').textContent=planName;
+  $('kAApport').textContent=eur(aAp); $('kADette').textContent=dline(aD);
+  $('kBApport').textContent=eur(bAp); $('kBDette').textContent=dline(bD);
+  $('chartSub').textContent='jusqu\'en '+moisLong(tl.end);
+  $('topSub').textContent='Apport visé pour '+moisLong(tl.end);
+  $('stAL').textContent='Apport en '+moisLong(tl.end);
+  $('stV').textContent=eur(cap); $('stA').textContent=eur(aAp);
+  $('stV').style.color=cap<0?'var(--rose)':'var(--teal)';
+
+  const netA=aAp-aD, netB=bAp-bD, diff=netA-netB;
+  $('netLine').innerHTML='Position nette à l\'échéance (apport moins dette restante) : '+eur(netA)+' avec '+planName.toLowerCase()+', '+eur(netB)+' sans remboursement anticipé, soit <span class="'+(diff>=0?'pos':'neg')+'">'+(diff>=0?'+':'−')+eur(Math.abs(diff))+'</span>.';
+
+  /* Courbe apport */
+  const labels=['Aujourd\'hui'], full=[''];
+  for(let m=1;m<=N;m++){ labels.push(moisCourt(dateOf(m))); full.push('Virement du 1er '+moisCourt(dateOf(m))); }
+  mark1=(A.free!==null && A.free>0 && A.free<=N && D0>0)?A.free:-1;
+  if(c1){
+    c1.$full=full;
+    c1.data.labels=labels;
+    c1.data.datasets[0].label=planName;
+    c1.data.datasets[0].data=A.cash.slice(0,N+1);
+    c1.data.datasets[1].data=B.cash.slice(0,N+1);
+    c1.update('none');
+  }
+
+  /* Dettes */
+  renderDebts(s,A,B,D0,dateOf,cap,rev);
+
+  /* Contrôles */
+  document.querySelectorAll('#seg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===s.strat)));
+  $('segHint').textContent=s.strat==='aval'
+    ?'Le taux le plus élevé d\'abord : c\'est la méthode qui coûte le moins d\'intérêts.'
+    :'Le plus petit solde d\'abord : chaque dette soldée libère sa mensualité pour la suivante.';
+  save();
+}
+
+function renderDebts(s,A,B,D0,dateOf,cap,rev){
+  const body=$('debtBody'), wrap=$('c2wrap'), key=$('c2key');
+  if(D0<=0.5){
+    body.innerHTML='<div class="debt-hero">Aucune dette à purger<small>Tout le surplus part directement dans l\'apport.</small></div>';
+    wrap.style.display='none'; key.style.display='none'; $('debtSub').textContent='';
+    return;
+  }
+  wrap.style.display=''; key.style.display='';
+  const names={auto:'Crédit auto',conso:'Prêt conso'};
+  const cap0=Math.max(1,...[A.payoff.auto,A.payoff.conso,B.payoff.auto,B.payoff.conso].filter(v=>v!==null));
+  const planName=s.strat==='aval'?'Avalanche':'Boule de neige';
+  $('debtSub').textContent=planName.toLowerCase()+', '+s.part+' % du surplus';
+
+  let head;
+  if(A.free===null) head='<div class="debt-hero">Pas de fin en vue<small>Les mensualités ne couvrent pas les intérêts et aucun surplus n\'est injecté.</small></div>';
+  else if(A.free===0) head='<div class="debt-hero">Déjà libre de dette</div>';
+  else head='<div class="debt-hero">Libre de dette en '+fm(A.free)+'<small>Dernière mensualité le '+jourLong(dateOf(A.free))+'</small></div>';
+
+  let chips='';
+  if(B.free===null) chips+='<span class="chip">Sans remboursement anticipé : <b>jamais soldées</b></span>';
+  else chips+='<span class="chip">Sans remboursement anticipé : <b>'+fm(B.free)+'</b></span>';
+  if(A.free!==null && B.free!==null && B.free>A.free){
+    chips+='<span class="chip">Gain : <b>'+fm(B.free-A.free)+'</b> et <b>'+eur(Math.max(0,B.interest-A.interest))+'</b> d\'intérêts en moins</span>';
+  }
+  const fst=order([{id:'auto',bal:s.kAuto,r:s.tAuto},{id:'conso',bal:s.kConso,r:s.tConso}],s.strat==='aval'?'aval':'snow')[0];
+  if(fst && s.part>0) chips+='<span class="chip">Cible en premier : <b>'+names[fst.id]+'</b></span>';
+
+  const ids=['auto','conso'].sort((x,y)=>(A.payoff[x]===null?1e9:A.payoff[x])-(A.payoff[y]===null?1e9:A.payoff[y]));
+  const rows=ids.map(id=>{
+    const pa=A.payoff[id], pb=B.payoff[id];
+    const bal=id==='auto'?s.kAuto:s.kConso;
+    if(bal<=0.5) return '<div class="row"><div class="row-h"><span>'+names[id]+'</span><em>Déjà soldé</em></div></div>';
+    const wa=pa===null?100:Math.max(3,pa/cap0*100), wb=pb===null?100:Math.max(3,pb/cap0*100);
+    return '<div class="row"><div class="row-h"><span>'+names[id]+'</span><em>'+(pa===null?'jamais soldé':'soldé en '+moisLong(dateOf(pa)))+'</em></div>'+
+      '<div class="bar"><i class="'+(pa===null?'never':'')+'" style="width:'+wa+'%;background:'+(pa===null?'':'var(--amber)')+'"></i></div>'+
+      '<div class="bar thin"><i class="'+(pb===null?'never':'')+'" style="width:'+wb+'%;background:'+(pb===null?'':'var(--peri)')+'"></i></div>'+
+      '<div class="row-f">Sans remboursement anticipé : '+(pb===null?'jamais':moisLong(dateOf(pb)))+'</div></div>';
+  }).join('');
+
+  const freed=rev-s.loyer-s.carbu-s.vie;
+  const freeLine=(A.free!==null && A.free>0)
+    ?'<p class="free-line">Une fois les dettes soldées, le virement du 1er passe à <b>'+eur(freed)+'</b> par mois.</p>':'';
+  body.innerHTML=head+'<div class="chips">'+chips+'</div>'+rows+freeLine;
+
+  /* Courbe de dette */
+  if(c2){
+    let far=Math.max(6,A.free||0,B.free||0);
+    if(A.free===null||B.free===null) far=Math.max(far,60);
+    const L=Math.min(96,Math.max(far,timeline(s).N));
+    const labels=['Aujourd\'hui'], full=[''];
+    for(let m=1;m<=L;m++){ labels.push(moisCourt(dateOf(m))); full.push('Virement du 1er '+moisCourt(dateOf(m))); }
+    c2.$full=full;
+    c2.data.labels=labels;
+    c2.data.datasets[0].label=planName;
+    c2.data.datasets[0].data=A.debt.slice(0,L+1);
+    c2.data.datasets[1].data=B.debt.slice(0,L+1);
+    c2.update('none');
+  }
+}
+
+/* ================= Barre de résumé ================= */
+function initSticky(){
+  if(!('IntersectionObserver' in window)) return;
+  const st=$('sticky');
+  new IntersectionObserver(([e])=>{ st.classList.toggle('on',!e.isIntersecting); },{threshold:0}).observe($('hero'));
+}
+
+/* ================= Icône et manifeste (écran d'accueil) ================= */
+function icon(size){
+  const c=document.createElement('canvas'); c.width=c.height=size;
+  const x=c.getContext('2d');
+  x.fillStyle=C.bg; x.fillRect(0,0,size,size);
+  x.strokeStyle=C.teal; x.lineWidth=size*.075; x.lineCap='round'; x.lineJoin='round';
+  x.beginPath(); x.moveTo(size*.2,size*.72);
+  x.bezierCurveTo(size*.42,size*.72,size*.5,size*.5,size*.8,size*.28); x.stroke();
+  x.fillStyle=C.teal; x.beginPath(); x.arc(size*.8,size*.28,size*.06,0,Math.PI*2); x.fill();
+  return c.toDataURL('image/png');
+}
+function initInstall(){
+  try{
+    const add=(rel,href,extra)=>{ const l=document.createElement('link'); l.rel=rel; l.href=href; if(extra) l.sizes=extra; document.head.appendChild(l); };
+    add('apple-touch-icon',icon(180),'180x180');
+    add('icon',icon(64));
+    const man={name:'Cap 2027',short_name:'Cap 2027',display:'standalone',background_color:'#0a0e16',theme_color:'#0a0e16',start_url:'.',
+      icons:[{src:icon(192),sizes:'192x192',type:'image/png'},{src:icon(512),sizes:'512x512',type:'image/png'}]};
+    add('manifest',URL.createObjectURL(new Blob([JSON.stringify(man)],{type:'application/manifest+json'})));
+  }catch(e){}
+}
+
+/* ================= Démarrage ================= */
+build();
+initCharts();
+initSticky();
+initInstall();
+update();
+})();
+</script>
+</body>
+</html>
